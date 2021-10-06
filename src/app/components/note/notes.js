@@ -1,10 +1,11 @@
-import engine from '../lib/engine/engine';
+import engine from '../../lib/engine/engine';
 import cardT from './note.tmp';
-import getLocation from '../lib/geolocation';
+import { getLocation, separateCoords } from '../../lib/geolocation';
 
 export default class Notes {
-    constructor() {
-        this.container = document.querySelector('.form');
+    constructor(errorHandler) {
+        this.getManualLocation = errorHandler;
+        this.container = document.querySelector('.form-content');
 
         this.notes = this.container.querySelector('.content');
         this.input = document.querySelector('.note-input');
@@ -23,8 +24,19 @@ export default class Notes {
     }
 
     async addNote(txt) {
-        const location = await getLocation();
+        let location = null;
 
+        try {
+            location = await getLocation();
+        } catch (e) {
+            const locationStr = await this.getManualLocation();
+            location = separateCoords(locationStr);
+        }
+
+        this.insertNote(txt, location);
+    }
+
+    insertNote(txt, location) {
         const html = engine(cardT(txt, location));
         this.notes.insertAdjacentHTML('afterbegin', html);
     }

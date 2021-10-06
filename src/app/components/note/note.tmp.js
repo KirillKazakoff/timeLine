@@ -1,4 +1,4 @@
-import { getTime } from '../lib/utils';
+import { getTime } from '../../lib/utils';
 
 const textT = (txt) => ({
     block: 'span',

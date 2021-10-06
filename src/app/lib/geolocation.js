@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 /* eslint-disable no-param-reassign */
 function getFixedTransfrom(coords) {
     const { latitude, longitude } = coords;
@@ -8,11 +9,15 @@ function getFixedTransfrom(coords) {
     }, {});
 }
 
-export default function getLocation() {
+export function getLocation() {
     if (navigator.geolocation) {
         return (async () => {
-            const promise = new Promise((resolve) => {
-                navigator.geolocation.getCurrentPosition((position) => resolve(position));
+            const promise = new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    resolve(position);
+                }, (error) => {
+                    reject(error);
+                });
             });
 
             const result = await promise;
@@ -20,4 +25,13 @@ export default function getLocation() {
         })();
     }
     return false;
+}
+
+export function separateCoords(coordsStr) {
+    const coords = coordsStr.match(/[+\-\d.]+/g);
+    const mapped = coords.map((axis) => parseFloat(axis).toFixed(3));
+
+    const [latitude, longitude] = mapped;
+
+    return { latitude, longitude };
 }
